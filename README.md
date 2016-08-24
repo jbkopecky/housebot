@@ -1,4 +1,4 @@
-# housebot
+# :house: housebot
 Work In Progress ...
 
-Personal Project to study Paris housing market.
+Personal project to study Paris housing market.
