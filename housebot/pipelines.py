@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
-
-# Define your item pipelines here
-#
-# Don't forget to add your pipeline to the ITEM_PIPELINES setting
-# See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import unicodedata
 from scrapy import signals
 from scrapy.xlib.pydispatch import dispatcher
 import sqlite3
+import os.path as path
 import re
 
 from settings import DATABASE
@@ -66,10 +62,12 @@ class SQLiteStorePipeline(object):
 
     def process_item(self, item, domain):
         try:
-            self.conn.execute('insert into blog values(?,?,?)',
-                              (item['url'], item['raw'], unicode(domain)))
+            # ID url title arrondissement prix
+            self.conn.execute('insert into annonce values(?,?,?,?,?)',
+                             (item['ID'], item['url'], item['title'], item['arrondissement'], item['prix'])
+                             )
         except:
-            print 'Failed to insert item: ' + item['url']
+            print 'Failed to insert item: ' + item['ID']
         return item
 
     def initialize(self):
@@ -87,6 +85,7 @@ class SQLiteStorePipeline(object):
     def create_table(self, filename):
         conn = sqlite3.connect(filename)
         conn.execute("""create table annonce
-                     (url text primary key, raw text, domain text)""")
+                     (ID integer primary key, url text, title text, arrondissement text, prix integer)""")
         conn.commit()
         return conn
+

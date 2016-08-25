@@ -46,6 +46,7 @@ class SelogerSpider(Spider):
         for sel in response.xpath('//article'):
             item = HousebotItem()
             item['seloger_id'] = sel.xpath('@data-listing-id').extract()[0]
+            item['ID'] = item['seloger_id']
             info = sel.xpath('.//div[contains(@class, "listing_info")]')
             url = info.xpath('.//h2/a/@href').extract()[0]
             item['link_to_annonce'] = url

@@ -13,11 +13,12 @@ BOT_NAME = 'housebot'
 SPIDER_MODULES = ['housebot.spiders']
 NEWSPIDER_MODULE = 'housebot.spiders'
 
-DATABASE = './../data/raw_data.db'
+DATABASE = './data/raw_data.db'
 
 ITEM_PIPELINES = {
-        'housebot.pipelines.Debug': 100,
-        # 'housebot.pipelines.CleanText' : 400,
+        # 'housebot.pipelines.Debug': 100,
+        'housebot.pipelines.CleanText' : 400,
+        'housebot.pipelines.SQLiteStorePipeline': 500,
         }
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
