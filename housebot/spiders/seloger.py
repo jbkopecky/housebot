@@ -49,7 +49,7 @@ class SelogerSpider(Spider):
             item['ID'] = item['seloger_id']
             info = sel.xpath('.//div[contains(@class, "listing_info")]')
             url = info.xpath('.//h2/a/@href').extract()[0]
-            item['link_to_annonce'] = url
+            item['url'] = url
             item['title'] = info.xpath('.//h2/a/text()').extract()[0]
             item['arrondissement'] = info.xpath('.//h2/a/span/text()').extract()[0]
             item['prix'] = info.xpath('.//a[contains(@class, "amount")]/text()').extract()[0]

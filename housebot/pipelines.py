@@ -66,6 +66,7 @@ class SQLiteStorePipeline(object):
             self.conn.execute('insert into annonce values(?,?,?,?,?)',
                              (item['ID'], item['url'], item['title'], item['arrondissement'], item['prix'])
                              )
+            import ipdb; ipdb.set_trace() # BREAKPOINT
         except:
             print 'Failed to insert item: ' + item['ID']
         return item
@@ -85,7 +86,7 @@ class SQLiteStorePipeline(object):
     def create_table(self, filename):
         conn = sqlite3.connect(filename)
         conn.execute("""create table annonce
-                     (ID integer primary key, url text, title text, arrondissement text, prix integer)""")
+                     (ID text primary key, url text, title text, arrondissement text, prix text)""")
         conn.commit()
         return conn
 

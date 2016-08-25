@@ -6,7 +6,7 @@ class HousebotItem(scrapy.Item):
     ID = scrapy.Field()
 
     seloger_id = scrapy.Field()
-    link_to_annonce = scrapy.Field()
+    url = scrapy.Field()
 
     title = scrapy.Field()
     arrondissement = scrapy.Field()
