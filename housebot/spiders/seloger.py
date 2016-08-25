@@ -30,14 +30,14 @@ class SelogerSpider(Spider):
     name = "seloger"
     allowed_domains = ["housebot.com"]
     base_url = 'http://www.seloger.com/list.htm'
-    # arr = [750112, 750113, 750111, 750120]
-    arr = [750112]
+    arr = [750112, 750113, 750111, 750120]
+    # arr = [750112]
     options = {
             'idtt':           [2],
             'idtypebien':     [1],
             'tri':            ['d_dt_crea'],
-            # 'LISTING-LISTpg': range(1,100),
-            'LISTING-LISTpg': [1],
+            'LISTING-LISTpg': range(1,100),
+            # 'LISTING-LISTpg': [1],
             'ci':             arr,
                 }
     start_urls = make_to_scrape_url_list(base_url, options)
@@ -61,24 +61,17 @@ class SelogerSpider(Spider):
                 yield Request(url, callback=self.parse_seloger, meta={'item':item}, dont_filter=True)
             elif domain == "www.bellesdemeures.com":
                 yield Request(url, callback=self.parse_bellesdemeures, meta={'item':item}, dont_filter=True)
-            else:
-                print "Zuuut"
 
     def parse_seloger(self, response):
-        print 'seloger'
         if 'expiree' in response.url:
-            import ipdb; ipdb.set_trace() # BREAKPOINT
             return
         item = response.meta['item']
         desc = response.xpath('//*[@id="detail"]/p[@class="description"]/text()').extract()
-        if len(desc) == 0:
-            import ipdb; ipdb.set_trace() # BREAKPOINT
         item['full_description'] = desc[0]
         item['property_list'] = response.xpath('//*[@id="detail"]/ol/li/text()').extract()[0]
         yield item
 
     def parse_bellesdemeures(self, response):
-        print 'belle dem'
         if 'expiree' in response.url:
             return
         item = response.meta['item']

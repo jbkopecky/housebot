@@ -13,7 +13,7 @@ BOT_NAME = 'housebot'
 SPIDER_MODULES = ['housebot.spiders']
 NEWSPIDER_MODULE = 'housebot.spiders'
 
-DATABASE = '../../data/raw_data.db'
+DATABASE = './../data/raw_data.db'
 
 ITEM_PIPELINES = {
         'housebot.pipelines.Debug': 100,
