@@ -45,6 +45,7 @@ class CleanText(object):
                     for k in range(0, len(item[f])):
                         if isinstance(item[f][k], unicode):
                             item[f][k] = self.to_ascii(item[f][k])
+                            item[f][k] = self.remove_useless_spaces(item[f][k])
                         item[f][k] = self.clean_it(item[f][k])
         return item
 
@@ -56,6 +57,12 @@ class CleanText(object):
 
     def to_ascii(self, field):
         return unicodedata.normalize('NFKD', field).encode('ascii','ignore')
+
+    def remove_useless_spaces(self, field):
+        field = field.replace("  ", "")
+        field = field[1:] if field[0] == " " else field
+        field = field[:-1] if field[-1] == " " else field
+        return field
 
 
 class ToSqliteDB(object):
@@ -79,6 +86,7 @@ class ToSqliteDB(object):
         else:
             self.insert_item_price(item, now.timestamp)
             self.insert_item_main(item)
+            self.insert_item_tag_list(item)
             return item
 
     def check_seen_before(self, item):
@@ -102,7 +110,20 @@ class ToSqliteDB(object):
                              (item['ID'], item['url'], item['title'], item['arrondissement'], item['agency_name'], item['agency_phone'])
                              )
         except:
-            print 'Failed to insert item price: ' + item['ID']
+            print 'Failed to insert item main: ' + item['ID']
+
+    def insert_item_single_tag(self, item_id, tag):
+        try:
+            self.conn.execute('insert into tags values(?,?)',
+                             (item_id, tag)
+                             )
+        except:
+            print 'Failed to insert item tag: ' + item_id + ": " + tag
+
+    def insert_item_tag_list(self, item):
+        for t in item['property_list']:
+            if not (t == " " or t == ""):
+                self.insert_item_single_tag(item['ID'], t)
 
     def initialize(self):
         if path.exists(self.filename):
@@ -122,6 +143,8 @@ class ToSqliteDB(object):
                         (ID text, date_seen int, prix text, CONSTRAINT prix_id PRIMARY KEY (ID, date_seen))""")
         conn.execute("""create table annonce
                      (ID text primary key, url text, title text, arrondissement text, agency_name text, agency_phone text)""")
+        conn.execute("""create table tags
+                     (ID text primary key, tag text)""")
         conn.commit()
         return conn
 

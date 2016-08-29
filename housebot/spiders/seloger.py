@@ -3,6 +3,7 @@ from scrapy.spiders import Spider
 from scrapy.selector import HtmlXPathSelector
 from scrapy import Request
 from housebot.items import HousebotItem
+import logging
 import itertools as it
 
 
@@ -64,18 +65,22 @@ class SelogerSpider(Spider):
                 yield Request(url, callback=self.parse_bellesdemeures, meta={'item':item}, dont_filter=True)
 
     def parse_seloger(self, response):
-        if 'expiree' in response.url:
-            return
         item = response.meta['item']
+        if 'Location' in response.headers.keys():
+            if 'expiree' in response.headers['Location']:
+                logging.info("%s has expired, skipping..." % item['url'])
+                return
         desc = response.xpath('//*[@id="detail"]/p[@class="description"]/text()').extract()
         item['full_description'] = desc[0]
         item['property_list'] = response.xpath('//*[@id="detail"]/ol/li/text()').extract()
         yield item
 
     def parse_bellesdemeures(self, response):
-        if 'expiree' in response.url:
-            return
         item = response.meta['item']
+        if 'Location' in response.headers.keys():
+            if 'expiree' in response.headers['Location']:
+                logging.info("%s has expired, skipping..." % item['url'])
+                return
         item['full_description'] = response.xpath('//*[@id="detail_description"]/p[@class="descriptif "]/text()').extract()[0]
         item['property_list'] = response.xpath('//*[@id="detail_criteres"]/ul/li/text()').extract()
         yield item

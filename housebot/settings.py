@@ -6,7 +6,7 @@ BOT_NAME = 'housebot'
 SPIDER_MODULES = ['housebot.spiders']
 NEWSPIDER_MODULE = 'housebot.spiders'
 
-DATABASE = './data/data.db'
+DATABASE = './data/data_raw.db'
 
 # The crawler will update price if it has seen this article before the time
 # defined below. TIME_SCALE is an 'arrow' library 'replace' method kwarg
