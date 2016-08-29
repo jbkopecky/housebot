@@ -12,7 +12,6 @@ class HousebotItem(scrapy.Item):
     arrondissement = scrapy.Field()
     prix = scrapy.Field()
 
-    description = scrapy.Field()
     property_list = scrapy.Field()
 
     agency_name = scrapy.Field()

@@ -30,14 +30,14 @@ class SelogerSpider(Spider):
     name = "seloger"
     allowed_domains = ["housebot.com"]
     base_url = 'http://www.seloger.com/list.htm'
-    arr = [750112, 750113, 750111, 750120]
-    # arr = [750112]
+    # arr = [750112, 750113, 750111, 750120]
+    arr = [750112]
     options = {
             'idtt':           [2],
             'idtypebien':     [1],
             'tri':            ['d_dt_crea'],
-            'LISTING-LISTpg': range(1,100),
-            # 'LISTING-LISTpg': [1],
+            # 'LISTING-LISTpg': range(1,100),
+            'LISTING-LISTpg': [1],
             'ci':             arr,
                 }
     start_urls = make_to_scrape_url_list(base_url, options)
@@ -53,12 +53,12 @@ class SelogerSpider(Spider):
             item['title'] = info.xpath('.//h2/a/text()').extract()[0]
             item['arrondissement'] = info.xpath('.//h2/a/span/text()').extract()[0]
             item['prix'] = info.xpath('.//a[contains(@class, "amount")]/text()').extract()[0]
-            item['description'] = ''.join(info.xpath('.//p[contains(@class, "description")]/text()').extract())
+            # item['description'] = ''.join(info.xpath('.//p[contains(@class, "description")]/text()').extract())
             agen = sel.xpath('.//div[contains(@class, "agency_contact")]')
             item['agency_name'] = agen.xpath('.//*[contains(@class, "agency_name")]/@data-tooltip').extract()[0]
             item['agency_phone'] = agen.xpath('.//div[contains(@class, "agency_phone")]/@data-phone').extract()[0]
             domain = url.split("/")[2]
-            if domain == "www.seloger.com": 
+            if domain == "www.seloger.com":
                 yield Request(url, callback=self.parse_seloger, meta={'item':item}, dont_filter=True)
             elif domain == "www.bellesdemeures.com":
                 yield Request(url, callback=self.parse_bellesdemeures, meta={'item':item}, dont_filter=True)
@@ -69,7 +69,7 @@ class SelogerSpider(Spider):
         item = response.meta['item']
         desc = response.xpath('//*[@id="detail"]/p[@class="description"]/text()').extract()
         item['full_description'] = desc[0]
-        item['property_list'] = response.xpath('//*[@id="detail"]/ol/li/text()').extract()[0]
+        item['property_list'] = response.xpath('//*[@id="detail"]/ol/li/text()').extract()
         yield item
 
     def parse_bellesdemeures(self, response):
