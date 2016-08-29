@@ -6,10 +6,12 @@ from scrapy.exceptions import DropItem
 import sqlite3
 import os.path as path
 import arrow
+import logging
 import re
 
 from settings import DATABASE
 from settings import TIME_SCALE
+
 
 class Debug(object):
     def __init__(self):
@@ -65,6 +67,23 @@ class CleanText(object):
         return field
 
 
+class TokenizeTags(object):
+    def process_item(self, item, domain):
+        tags = {}
+        for t in item['property_list']:
+            ints = re.findall(r"[^\s][-+]?\d*\.\d+|\d+\s", t)
+            if len(ints) > 1:
+                logging.error('Too Many Numbers to deal with : %s, %s' % (t,ints))
+                tags[t] = 0
+            elif len(ints) == 0:
+                tags[t] = 0
+            else: 
+                integer = ints[0]
+                tags[t.replace(integer, '[xx]')] = integer
+        item['property_list'] = tags
+        return item
+
+
 class ToSqliteDB(object):
     filename = DATABASE
     time_scale = TIME_SCALE
@@ -87,6 +106,7 @@ class ToSqliteDB(object):
             self.insert_item_price(item, now.timestamp)
             self.insert_item_main(item)
             self.insert_item_tag_list(item)
+            self.insert_item_description(item)
             return item
 
     def check_seen_before(self, item):
@@ -112,18 +132,27 @@ class ToSqliteDB(object):
         except:
             print 'Failed to insert item main: ' + item['ID']
 
-    def insert_item_single_tag(self, item_id, tag):
+    def insert_item_single_tag(self, item_id, tag, tag_value):
         try:
-            self.conn.execute('insert into tags values(?,?)',
-                             (item_id, tag)
+            self.conn.execute('insert into tags values(?,?,?)',
+                             (item_id, tag, tag_value)
                              )
         except:
             print 'Failed to insert item tag: ' + item_id + ": " + tag
 
     def insert_item_tag_list(self, item):
-        for t in item['property_list']:
+        tags = item['property_list']
+        for t in tags:
             if not (t == " " or t == ""):
-                self.insert_item_single_tag(item['ID'], t)
+                self.insert_item_single_tag(item['ID'], t, tags[t])
+
+    def insert_item_description(self, item):
+        try:
+            self.conn.execute('insert into description values(?,?)',
+                             (item['ID'], item['full_description'])
+                             )
+        except:
+            print 'Failed to insert item tag: ' + item_id + ": " + tag
 
     def initialize(self):
         if path.exists(self.filename):
@@ -144,7 +173,9 @@ class ToSqliteDB(object):
         conn.execute("""create table annonce
                      (ID text primary key, url text, title text, arrondissement text, agency_name text, agency_phone text)""")
         conn.execute("""create table tags
-                     (ID text primary key, tag text)""")
+                     (ID text , tag text, tag_value text, constraint tags_id primary key (ID, tag))""")
+        conn.execute("""create table description
+                     (ID text primary key, description text)""")
         conn.commit()
         return conn
 

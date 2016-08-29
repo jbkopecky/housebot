@@ -6,7 +6,7 @@ BOT_NAME = 'housebot'
 SPIDER_MODULES = ['housebot.spiders']
 NEWSPIDER_MODULE = 'housebot.spiders'
 
-DATABASE = './data/data_raw.db'
+DATABASE = './data/data.db'
 
 # The crawler will update price if it has seen this article before the time
 # defined below. TIME_SCALE is an 'arrow' library 'replace' method kwarg
@@ -16,7 +16,8 @@ TIME_SCALE = {'hours': -6}
 ITEM_PIPELINES = {
         # 'housebot.pipelines.Debug': 100,
         'housebot.pipelines.CleanText' : 100,
-        'housebot.pipelines.ToSqliteDB': 200,
+        'housebot.pipelines.TokenizeTags': 200,
+        'housebot.pipelines.ToSqliteDB': 300,
         }
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -25,7 +26,7 @@ DOWNLOADER_MIDDLEWARES = {
     'housebot.comm.rotate_useragent.RotateUserAgentMiddleware' : 400
     }
 
-DOWNLOAD_DELAY = 5.
+DOWNLOAD_DELAY = 1.
 
 CONCURRENT_ITEMS = 1
 CONCURRENT_REQUESTS = 1

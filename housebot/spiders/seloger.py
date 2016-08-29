@@ -31,14 +31,14 @@ class SelogerSpider(Spider):
     name = "seloger"
     allowed_domains = ["housebot.com"]
     base_url = 'http://www.seloger.com/list.htm'
-    # arr = [750112, 750113, 750111, 750120]
-    arr = [750112]
+    arr = ['7501%02i' % x for x in range(1,20)]
+    # arr = [750112]
     options = {
             'idtt':           [2],
             'idtypebien':     [1],
             'tri':            ['d_dt_crea'],
-            # 'LISTING-LISTpg': range(1,100),
-            'LISTING-LISTpg': [1],
+            'LISTING-LISTpg': range(1,100),
+            # 'LISTING-LISTpg': [1],
             'ci':             arr,
                 }
     start_urls = make_to_scrape_url_list(base_url, options)
