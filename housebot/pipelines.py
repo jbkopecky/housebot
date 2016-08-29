@@ -97,7 +97,7 @@ class ToSqliteDB(object):
         now = arrow.now()
         seen = self.check_seen_before(item)
         if len(seen) > 0:
-            last_seen = max(dates_seen)
+            last_seen = max(seen)
             time_limit = now.replace(**self.time_scale).timestamp
             if last_seen < time_limit:
                 self.insert_item_price(item, now.timestamp)
