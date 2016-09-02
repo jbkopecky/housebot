@@ -26,7 +26,7 @@ DOWNLOADER_MIDDLEWARES = {
     'housebot.comm.rotate_useragent.RotateUserAgentMiddleware' : 400
     }
 
-DOWNLOAD_DELAY = 1.
+DOWNLOAD_DELAY = .5
 
 CONCURRENT_ITEMS = 1
 CONCURRENT_REQUESTS = 1

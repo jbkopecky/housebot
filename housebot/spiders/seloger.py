@@ -37,7 +37,7 @@ class SelogerSpider(Spider):
             'idtt':           [2],
             'idtypebien':     [1],
             'tri':            ['d_dt_crea'],
-            'LISTING-LISTpg': range(1,100),
+            'LISTING-LISTpg': range(1,10),
             # 'LISTING-LISTpg': [1],
             'ci':             arr,
                 }
