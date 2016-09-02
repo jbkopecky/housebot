@@ -44,25 +44,29 @@ class SelogerSpider(Spider):
     start_urls = make_to_scrape_url_list(base_url, options)
 
     def parse(self, response):
-        for sel in response.xpath('//article'):
-            item = HousebotItem()
-            item['seloger_id'] = sel.xpath('@data-listing-id').extract()[0]
-            item['ID'] = item['seloger_id']
-            info = sel.xpath('.//div[contains(@class, "listing_info")]')
-            url = info.xpath('.//h2/a/@href').extract()[0]
-            item['url'] = url
-            item['title'] = info.xpath('.//h2/a/text()').extract()[0]
-            item['arrondissement'] = info.xpath('.//h2/a/span/text()').extract()[0]
-            item['prix'] = info.xpath('.//a[contains(@class, "amount")]/text()').extract()[0]
-            # item['description'] = ''.join(info.xpath('.//p[contains(@class, "description")]/text()').extract())
-            agen = sel.xpath('.//div[contains(@class, "agency_contact")]')
-            item['agency_name'] = agen.xpath('.//*[contains(@class, "agency_name")]/@data-tooltip').extract()[0]
-            item['agency_phone'] = agen.xpath('.//div[contains(@class, "agency_phone")]/@data-phone').extract()[0]
-            domain = url.split("/")[2]
-            if domain == "www.seloger.com":
-                yield Request(url, callback=self.parse_seloger, meta={'item':item}, dont_filter=True)
-            elif domain == "www.bellesdemeures.com":
-                yield Request(url, callback=self.parse_bellesdemeures, meta={'item':item}, dont_filter=True)
+        articles = response.xpath('//article')
+        if len(articles) == 0:
+            logging.info("No article listing in this page %s !!!" % response.url)
+        else:
+            for sel in articles:
+                item = HousebotItem()
+                item['seloger_id'] = sel.xpath('@data-listing-id').extract()[0]
+                item['ID'] = item['seloger_id']
+                info = sel.xpath('.//div[contains(@class, "listing_info")]')
+                url = info.xpath('.//h2/a/@href').extract()[0]
+                item['url'] = url
+                item['title'] = info.xpath('.//h2/a/text()').extract()[0]
+                item['arrondissement'] = info.xpath('.//h2/a/span/text()').extract()[0]
+                item['prix'] = info.xpath('.//a[contains(@class, "amount")]/text()').extract()[0]
+                # item['description'] = ''.join(info.xpath('.//p[contains(@class, "description")]/text()').extract())
+                agen = sel.xpath('.//div[contains(@class, "agency_contact")]')
+                item['agency_name'] = agen.xpath('.//*[contains(@class, "agency_name")]/@data-tooltip').extract()[0]
+                item['agency_phone'] = agen.xpath('.//div[contains(@class, "agency_phone")]/@data-phone').extract()[0]
+                domain = url.split("/")[2]
+                if domain == "www.seloger.com":
+                    yield Request(url, callback=self.parse_seloger, meta={'item':item}, dont_filter=True)
+                elif domain == "www.bellesdemeures.com":
+                    yield Request(url, callback=self.parse_bellesdemeures, meta={'item':item}, dont_filter=True)
 
     def parse_seloger(self, response):
         item = response.meta['item']
@@ -71,9 +75,13 @@ class SelogerSpider(Spider):
                 logging.info("%s has expired, skipping..." % item['url'])
                 return
         desc = response.xpath('//*[@id="detail"]/p[@class="description"]/text()').extract()
-        item['full_description'] = desc[0]
-        item['property_list'] = response.xpath('//*[@id="detail"]/ol/li/text()').extract()
-        yield item
+        if len(desc) == 0:
+            logging.error("Did not find a description for %s" % item['url'])
+            return
+        else:
+            item['full_description'] = desc[0]
+            item['property_list'] = response.xpath('//*[@id="detail"]/ol/li/text()').extract()
+            yield item
 
     def parse_bellesdemeures(self, response):
         item = response.meta['item']
@@ -81,7 +89,12 @@ class SelogerSpider(Spider):
             if 'expiree' in response.headers['Location']:
                 logging.info("%s has expired, skipping..." % item['url'])
                 return
-        item['full_description'] = response.xpath('//*[@id="detail_description"]/p[@class="descriptif "]/text()').extract()[0]
-        item['property_list'] = response.xpath('//*[@id="detail_criteres"]/ul/li/text()').extract()
-        yield item
+        desc = response.xpath('//*[@id="detail_description"]/p[@class="descriptif "]/text()').extract()
+        if len(desc) == 0:
+            logging.error("Did not find a description for %s" % item['url'])
+            return
+        else:
+            item['full_description'] = desc[0]
+            item['property_list'] = response.xpath('//*[@id="detail_criteres"]/ul/li/text()').extract()
+            yield item
 
