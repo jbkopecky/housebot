@@ -7,14 +7,16 @@ import re
 
 
 def replace_0_by_1(data):
-    values = data['values'].values
+    values = data['tag_value'].values
     out = []
     for v in values:
         if v == 0:
             out.append(1)
+        elif v == '0':
+            out.append(1)
         else:
             out.append(v)
-    data['values'] = out
+    data['tag_value'] = out
     return data
 
 def remove_first_trailing_ws(data):
@@ -44,7 +46,6 @@ def extract_tag_values(data, tag_contains, parse_value, replace=False):
             if '[xx]' not in t:
                 val = parse_value(t)
                 if not len(val) == 1:
-                    import ipdb; ipdb.set_trace() # BREAKPOINT
                     print "%s [ERROR] Did not find value in %s" % (__name__, t)
                 else:
                     replace_value = val[0]
@@ -176,6 +177,15 @@ def drop_bullshit(data, cutoff):
     return data 
 
 
+def to_matrix(data, column_name, index_name):
+    columns = pd.unique(data[column_name].values)
+    index = pd.unique(data[index_name].values)
+    df = pd.DataFrame(columns=columns, index=index)
+    for i in range(len(data)):
+        ind, tag, value = data.iloc[i]
+        df.at[ind, tag] = value
+    return df
+
 if __name__ == "__main__":
     tag_parse_map = {
             'annee de construction': parse_annee_construction_value,
@@ -216,7 +226,10 @@ if __name__ == "__main__":
     tags = shrink_tags(tags, tag_split, replace=True)
     tags = replace_name_tag(tags, tag_name_map)
     tags = drop_bullshit(tags, 0.0001)
-    print_unique_tag_count(tags)
+    # print_unique_tag_count(tags)
     # for x in sorted(np.unique([ x for x in tags['tag'].values if 'cuisine' in x.lower()])):
         # print x
+    tags = replace_0_by_1(tags)
+    tags = to_matrix(tags, 'tag', 'ID')
+    print tags.head()
 
