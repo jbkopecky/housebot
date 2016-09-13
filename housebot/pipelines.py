@@ -12,14 +12,12 @@ import re
 from settings import DATABASE
 from settings import TIME_SCALE
 
-
 class Debug(object):
     def __init__(self):
         pass
 
     def process_item(self, item, spider):
         print "id: ", item['seloger_id']
-
 
 class CleanText(object):
     def __init__(self):
@@ -70,17 +68,18 @@ class CleanText(object):
 class TokenizeTags(object):
     def process_item(self, item, domain):
         tags = {}
-        for t in item['property_list']:
-            ints = re.findall(r"[^\s][-+]?\d*\.\d+|\d+\s", t)
-            if len(ints) > 1:
-                logging.error('Too Many Numbers to deal with : %s, %s' % (t,ints))
-                tags[t] = 0
-            elif len(ints) == 0:
-                tags[t] = 0
-            else: 
-                integer = ints[0]
-                tags[t.replace(integer, '[xx]')] = integer
-        item['property_list'] = tags
+        if 'property_list' in item.keys():
+            for t in item['property_list']:
+                ints = re.findall(r"[^\s][-+]?\d*\.\d+|\d+\s", t)
+                if len(ints) > 1:
+                    logging.error('Too Many Numbers to deal with : %s, %s' % (t,ints))
+                    tags[t] = 0
+                elif len(ints) == 0:
+                    tags[t] = 0
+                else:
+                    integer = ints[0]
+                    tags[t.replace(integer, '[xx]')] = integer
+            item['property_list'] = tags
         return item
 
 

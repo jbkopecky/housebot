@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 BOT_NAME = 'housebot'
 
 SPIDER_MODULES = ['housebot.spiders']
@@ -11,7 +10,9 @@ DATABASE = './data/raw_data.db'
 # The crawler will update price if it has seen this article before the time
 # defined below. TIME_SCALE is an 'arrow' library 'replace' method kwarg
 # >>> arrow.now().replace(**TIME_SCALE)
+
 TIME_SCALE = {'hours': -6}
+ARRONDISSEMENTS = ['7501%02i' % x for x in range(1,20)]
 
 ITEM_PIPELINES = {
         # 'housebot.pipelines.Debug': 100,

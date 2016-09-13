@@ -1,0 +1,2 @@
+[ ] load seen ids at spider instantiation 
+[ ] do not follow link if seen annonce

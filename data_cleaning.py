@@ -231,5 +231,6 @@ if __name__ == "__main__":
         # print x
     tags = replace_0_by_1(tags)
     tags = to_matrix(tags, 'tag', 'ID')
+    tags.to_csv('./data/tags.csv')
     print tags.head()
 
