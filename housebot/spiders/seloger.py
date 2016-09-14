@@ -6,11 +6,14 @@ from scrapy import Request
 from housebot.items import HousebotItem
 from housebot.settings import DATABASE
 from housebot.settings import ARRONDISSEMENTS
+from housebot.settings import SHUFFLE_URLS
+from housebot.settings import N_LIST
 
 import logging
 from os import path
 import sqlite3
 import itertools as it
+from random import shuffle
 
 
 def options_dict_to_options_string(options):
@@ -27,9 +30,11 @@ def combine_options(options):
     return combinations
 
 
-def make_to_scrape_url_list(base_url, options):
+def make_to_scrape_url_list(base_url, options, do_shuffle=False):
     option_list = combine_options(options)
     urls = [base_url + options_dict_to_options_string(opts) for opts in option_list]
+    if do_shuffle:
+        shuffle(urls)
     return urls
 
 
@@ -51,10 +56,10 @@ class SelogerSpider(Spider):
             'idtt':           [2],
             'idtypebien':     [1],
             'tri':            ['d_dt_crea'],
-            'LISTING-LISTpg': range(1,50),
+            'LISTING-LISTpg': range(1,N_LIST),
             'ci':             arr,
                 }
-    start_urls = make_to_scrape_url_list(base_url, options)
+    start_urls = make_to_scrape_url_list(base_url, options, do_shuffle=SHUFFLE_URLS)
     seen_ids = fetch_seen_IDs(DATABASE)
 
     def parse(self, response):

@@ -10,9 +10,12 @@ DATABASE = './data/raw_data.db'
 # The crawler will update price if it has seen this article before the time
 # defined below. TIME_SCALE is an 'arrow' library 'replace' method kwarg
 # >>> arrow.now().replace(**TIME_SCALE)
-
 TIME_SCALE = {'hours': -6}
-ARRONDISSEMENTS = ['7501%02i' % x for x in range(1,20)]
+
+# List Pages to scrape
+ARRONDISSEMENTS = ['7501%02i' % x for x in range(1,21)]
+N_LIST = 11
+SHUFFLE_URLS = True
 
 ITEM_PIPELINES = {
         # 'housebot.pipelines.Debug': 100,
@@ -21,13 +24,11 @@ ITEM_PIPELINES = {
         'housebot.pipelines.ToSqliteDB': 300,
         }
 
-# Crawl responsibly by identifying yourself (and your website) on the user-agent
-
 DOWNLOADER_MIDDLEWARES = {
     # Use these Middlewares to go throught proxies defined in PROXY_LIST file:
-    # 'scrapy.downloadermiddlewares.retry.RetryMiddleware': 90,
-    # 'scrapy_proxies.RandomProxy': 100,
-    # 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
+    'scrapy.downloadermiddlewares.retry.RetryMiddleware': 90,
+    'scrapy_proxies.RandomProxy': 100,
+    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
     # Use these Middlewares to rotate UserAgents:
     'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware' : None,
     'housebot.comm.rotate_useragent.RotateUserAgentMiddleware' : 400
@@ -36,9 +37,9 @@ DOWNLOADER_MIDDLEWARES = {
 DOWNLOAD_DELAY = .5
 
 # Proxy Settings:
-# RETRY_TIMES = 10
-# RETRY_HTTP_CODES = [500, 503, 504, 400, 403, 404, 408]
-# PROXY_LIST = './data/proxy/list.txt'
+RETRY_TIMES = 10
+RETRY_HTTP_CODES = [500, 503, 504, 400, 403, 404, 408]
+PROXY_LIST = './data/proxy/list.txt'
 
-CONCURRENT_ITEMS = 1
-CONCURRENT_REQUESTS = 1
+# CONCURRENT_ITEMS = 1
+# CONCURRENT_REQUESTS = 1
