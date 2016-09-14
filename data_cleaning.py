@@ -226,9 +226,6 @@ if __name__ == "__main__":
     tags = shrink_tags(tags, tag_split, replace=True)
     tags = replace_name_tag(tags, tag_name_map)
     tags = drop_bullshit(tags, 0.0001)
-    # print_unique_tag_count(tags)
-    # for x in sorted(np.unique([ x for x in tags['tag'].values if 'cuisine' in x.lower()])):
-        # print x
     tags = replace_0_by_1(tags)
     tags = to_matrix(tags, 'tag', 'ID')
     tags.to_csv('./data/tags.csv')

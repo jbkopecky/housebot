@@ -22,12 +22,23 @@ ITEM_PIPELINES = {
         }
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
+
 DOWNLOADER_MIDDLEWARES = {
+    # Use these Middlewares to go throught proxies defined in PROXY_LIST file:
+    # 'scrapy.downloadermiddlewares.retry.RetryMiddleware': 90,
+    # 'scrapy_proxies.RandomProxy': 100,
+    # 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
+    # Use these Middlewares to rotate UserAgents:
     'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware' : None,
     'housebot.comm.rotate_useragent.RotateUserAgentMiddleware' : 400
     }
 
 DOWNLOAD_DELAY = .5
+
+# Proxy Settings:
+# RETRY_TIMES = 10
+# RETRY_HTTP_CODES = [500, 503, 504, 400, 403, 404, 408]
+# PROXY_LIST = './data/proxy/list.txt'
 
 CONCURRENT_ITEMS = 1
 CONCURRENT_REQUESTS = 1

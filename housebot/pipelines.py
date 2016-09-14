@@ -108,6 +108,7 @@ class ToSqliteDB(object):
             self.insert_item_main(item)
             self.insert_item_tag_list(item)
             self.insert_item_description(item)
+            self.conn.commit()
             return item
 
     def check_seen_before(self, item):
