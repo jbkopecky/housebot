@@ -12,12 +12,14 @@ import re
 from settings import DATABASE
 from settings import TIME_SCALE
 
+
 class Debug(object):
     def __init__(self):
         pass
 
     def process_item(self, item, spider):
         print "id: ", item['seloger_id']
+
 
 class CleanText(object):
     def __init__(self):

@@ -51,7 +51,7 @@ class SelogerSpider(Spider):
             'idtt':           [2],
             'idtypebien':     [1],
             'tri':            ['d_dt_crea'],
-            'LISTING-LISTpg': range(1,10),
+            'LISTING-LISTpg': range(1,50),
             'ci':             arr,
                 }
     start_urls = make_to_scrape_url_list(base_url, options)
@@ -95,10 +95,10 @@ class SelogerSpider(Spider):
                                     url,
                                     callback=self.parse_bellesdemeures,
                                     meta={'item':item},
-                                    dont_filter=True,
+                                    dont_filter=True
                                       )
                     else:
-                        logging.info("Dropping %s because %s is not a supported domain redirection !")
+                        logging.info("Dropping %s because %s is not a supported domain redirection !" % (url, domain))
                         yield
                 else:
                     yield item
