@@ -1,2 +1,4 @@
 arrow==0.8.0
+scrapy-proxies==0.3
+Scrapy==1.1.2
 
