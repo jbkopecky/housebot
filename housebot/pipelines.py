@@ -11,6 +11,7 @@ import re
 
 from settings import DATABASE
 from settings import TIME_SCALE
+from parse_tag import TagParser
 
 
 class Debug(object):
@@ -68,19 +69,15 @@ class CleanText(object):
 
 
 class TokenizeTags(object):
+    def __init__(self):
+        self.parser = TagParser()
+
     def process_item(self, item, domain):
         tags = {}
         if 'property_list' in item.keys():
             for t in item['property_list']:
-                ints = re.findall(r"[^\s][-+]?\d*\.\d+|\d+\s", t)
-                if len(ints) > 1:
-                    logging.error('Too Many Numbers to deal with : %s, %s' % (t,ints))
-                    tags[t] = 0
-                elif len(ints) == 0:
-                    tags[t] = 0
-                else:
-                    integer = ints[0]
-                    tags[t.replace(integer, '[xx]')] = integer
+                name, value = self.parser.process_tag(t)
+                tags[t] = (name, value)
             item['property_list'] = tags
         return item
 
@@ -134,10 +131,10 @@ class ToSqliteDB(object):
         except:
             print 'Failed to insert item main: ' + item['ID']
 
-    def insert_item_single_tag(self, item_id, tag, tag_value):
+    def insert_item_single_tag(self, item_id, tag, tag_name, tag_value):
         try:
-            self.conn.execute('insert into tags values(?,?,?)',
-                             (item_id, tag, tag_value)
+            self.conn.execute('insert into tags values(?,?,?,?)',
+                             (item_id, tag, tag_name, tag_value)
                              )
         except:
             print 'Failed to insert item tag: ' + item_id + ": " + tag
@@ -146,7 +143,8 @@ class ToSqliteDB(object):
         tags = item['property_list']
         for t in tags:
             if not (t == " " or t == ""):
-                self.insert_item_single_tag(item['ID'], t, tags[t])
+                name, value = tags[t]
+                self.insert_item_single_tag(item['ID'], t, name, value)
 
     def insert_item_description(self, item):
         try:
@@ -175,7 +173,7 @@ class ToSqliteDB(object):
         conn.execute("""create table annonce
                      (ID text primary key, url text, title text, arrondissement text, agency_name text, agency_phone text)""")
         conn.execute("""create table tags
-                     (ID text , tag text, tag_value text, constraint tags_id primary key (ID, tag))""")
+                     (ID text , tag text, tag_name text, tag_value text, constraint tags_id primary key (ID, tag))""")
         conn.execute("""create table description
                      (ID text primary key, description text)""")
         conn.commit()

@@ -25,7 +25,7 @@ ITEM_PIPELINES = {
         }
 
 DOWNLOADER_MIDDLEWARES = {
-    # Use these Middlewares to go throught proxies defined in PROXY_LIST file:
+    # Use these Middlewares to go through proxies defined in PROXY_LIST file:
     'scrapy.downloadermiddlewares.retry.RetryMiddleware': 90,
     'scrapy_proxies.RandomProxy': 100,
     'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
@@ -41,5 +41,5 @@ RETRY_TIMES = 10
 RETRY_HTTP_CODES = [500, 503, 504, 400, 403, 404, 408]
 PROXY_LIST = './data/proxy/list.txt'
 
-# CONCURRENT_ITEMS = 1
+CONCURRENT_ITEMS = 1 # We do not parallelize pipelines because of sqlite.
 # CONCURRENT_REQUESTS = 1
