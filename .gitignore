@@ -89,4 +89,6 @@ ENV/
 .ropeproject
 
 #project specific
-data/
+data/*.db
+data/proxy/*.py
+data/proxy/list.txt
