@@ -90,5 +90,6 @@ ENV/
 
 #project specific
 data/*.db
+data/*.csv
 data/proxy/*.py
 data/proxy/list.txt

@@ -1,4 +1,8 @@
 import re
+import sqlite3
+import pandas as pd
+from collections import defaultdict
+
 
 class TagParser(object):
     def __init__(self):
@@ -60,10 +64,12 @@ class TagParser(object):
                     }
 
     def process_tag(self, tag):
+        m2 = True if "m2" in tag else False
         tag = tag.lower().replace("m2","[xx]")
         tag, tokens = self.find_token(tag)
         tag, num = self.find_num(tag)
         name = self.clean_name(tag)
+        name = name + "_m2" if m2 else name
         value = tokens if tokens is not None else None
         value = num if value is None else value
         value = '' if value is None else value
@@ -101,19 +107,65 @@ class TagParser(object):
             out = tag
         return out
 
+
+class UpdateDBTags(object):
+    def __init__(self, db, parser, dry_run=True):
+        self.db = db
+        self.dry_run = dry_run
+        self.parser = parser
+        self.changes = defaultdict(lambda: defaultdict())
+
+    def run(self):
+        self.initialize()
+        tags = pd.read_sql_query("SELECT * FROM TAGS", self.con)
+        self.collect_changes(tags)
+        self.apply_changes_if_not_dry()
+        self.close()
+
+    def initialize(self):
+        print("Connecting to %s ..." % self.db)
+        self.con = sqlite3.connect(DATABASE)
+
+    def collect_changes(self, tags):
+        print("Collecting Changes ...")
+        for i in range(len(tags)):
+            ID, tag, tag_name, tag_value = tags.iloc[i]
+            new_tag_name, new_tag_value = self.parser.process_tag(tag)
+            if new_tag_name != tag_name or new_tag_value != tag_value:
+                self.changes[(ID, tag)]['old'] = (tag_name, tag_value) 
+                self.changes[(ID, tag)]['new'] = (new_tag_name, new_tag_value)
+                if dry_run:
+                    print "-- Parse Function diff: [%s] %s:" % (ID, tag)
+                    print "     > Old: %s, %s" % (tag_name, tag_value)
+                    print "     > New: %s, %s" % (new_tag_name, new_tag_value)
+
+    def apply_changes_if_not_dry(self):
+        n = len(self.changes)
+        if n == 0:
+            print "No changes ! DB tags are up to date !"
+        elif self.dry_run:
+            print "Did NOT Apply Changes in database: %s !" % self.db
+        else:
+            print "Applying %s Changes in database: %s..." % (n, self.db)
+            for ID, tag in self.changes:
+                new_tag_name, new_tag_value = changes[(ID, tag)]['new']
+                self.con.execute("UPDATE tags SET tag_name=?, tag_value=? WHERE ID=? AND tag=?",
+                            (new_tag_name, new_tag_value, ID, tag)
+                        )
+            print "... Done !"
+
+    def close(self):
+        self.con.commit()
+        self.con.close()
+        print("Connexion to DB %s closed!" % self.db)
+        
+
 if __name__ == "__main__":
-    import pandas as pd
-    import sqlite3
+    from settings import DATABASE
 
-    con = sqlite3.connect("./data/raw_data.db")
-    tags = pd.read_sql_query("SELECT * FROM TAGS", con)
-    tags = tags['tag'].values
+    dry_run = True
+    parser = TagParser()
 
-    Parser = TagParser()
-
-    for t in tags[:696]:
-        print t, Parser.process_tag(t)
-
-
-
+    update_engine = UpdateDBTags(DATABASE, parser, dry_run=dry_run)
+    update_engine.run()
 

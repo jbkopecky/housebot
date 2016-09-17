@@ -1,4 +1,7 @@
 arrow==0.8.0
 scrapy-proxies==0.3
 Scrapy==1.1.2
+pandas=0.18.1
+scipy=0.13.3
+tqdm=4.8.4
 
