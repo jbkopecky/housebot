@@ -26,16 +26,16 @@ ITEM_PIPELINES = {
 
 DOWNLOADER_MIDDLEWARES = {
     # Use these Middlewares to go through proxies defined in PROXY_LIST file:
-        'scrapy.downloadermiddlewares.retry.RetryMiddleware': 90,
-        'scrapy_proxies.RandomProxy': 100,
-        'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
+        # 'scrapy.downloadermiddlewares.retry.RetryMiddleware': 90,
+        # 'scrapy_proxies.RandomProxy': 100,
+        # 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
     # Use these Middlewares to rotate UserAgents:
         'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware' : None,
         'housebot.comm.rotate_useragent.RotateUserAgentMiddleware' : 400
     }
 
-# CONCURRENT_REQUESTS = 1
-# DOWNLOAD_DELAY = .5
+CONCURRENT_REQUESTS = 1
+DOWNLOAD_DELAY = .5
 CONCURRENT_ITEMS = 1 # We do not parallelize pipelines because of sqlite.
 
 # Proxy Settings:
