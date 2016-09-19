@@ -33,8 +33,7 @@ Crawler settings are in `housebot/settings.py`.
 * `N_LIST` is the number of result pages the spider will go through for each
   arrondissement
 * `SHUFFLE_URLS`: if set to `True`, the spider will crawl randomly result
-  pages. This allows to potentially reduce bias due to the fact that first
-  results are usually sponsored results. 
+  pages.
 * `DOWNLOADER_MIDDLEWARES`: this dict is a scrapy config to enable Proxies and
   User Agent rotation.
 * `CONCURRENT_REQUESTS`: Comment out if using proxies.
