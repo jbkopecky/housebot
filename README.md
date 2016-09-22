@@ -43,3 +43,11 @@ Crawler settings are in `housebot/settings.py`.
 * `RETRY_TIMES` and `RETRY_HTTP_CODES`: Proxies are throwing lot of errors
   around..
 * `PROXY_LIST`: the location of the list.txt containing proxy addresses.
+
+## Results
+
+In progress ...
+
+Here is a general view of the price distribution:
+
+![General Scatter Plot](./plots/general_scatter.png)

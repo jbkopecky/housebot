@@ -71,19 +71,24 @@ def reshape_price(data):
 if __name__ == "__main__":
     print "* Connecting ..."
     con = sqlite3.connect("./data/raw_data.db")
+
     print "* Importing annonces ..."
     annonces = pd.read_sql_query("SELECT * FROM annonce", con, index_col='ID')
     annonces = annonces[['arrondissement', 'agency_phone']]
     annonces.index = [int(x) for x in annonces.index]
+
     print "* Importing description ..."
     descriptions = pd.read_sql_query("SELECT * FROM description", con, index_col='ID')
     descriptions.index = [int(x) for x in descriptions.index]
+
     print "* Importing prices ..."
     prices = pd.read_sql_query("SELECT * FROM prix", con)
     prices = reshape_price(prices)
+
     print "* Importing tags ..."
     tags = pd.read_sql_query("SELECT * FROM tags", con)
     tags = reshape_tags(tags, 'ID', 'tag_name', 'tag_value')
+
     print "* Merging into one dataframe..."
     con.close()
     data = pd.concat([annonces, descriptions, prices, tags], axis=1)

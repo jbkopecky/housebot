@@ -14,7 +14,7 @@ TIME_SCALE = {'hours': -6}
 
 # List Pages to scrape
 ARRONDISSEMENTS = ['7501%02i' % x for x in range(1,21)]
-N_LIST = 11
+N_LIST = 50
 SHUFFLE_URLS = True
 
 ITEM_PIPELINES = {
