@@ -1,4 +1,7 @@
 from sklearn.base import BaseEstimator, TransformerMixin
+from collections import defaultdict
+import pandas as pd
+import numpy as np
 
 
 class ItemSelector(BaseEstimator, TransformerMixin):
@@ -39,4 +42,53 @@ class ItemSelector(BaseEstimator, TransformerMixin):
     def transform(self, data_dict):
         return data_dict[self.key]
 
+class GoThrough(BaseEstimator, TransformerMixin):
+    def fit(self, x, y=None):
+        return self
+
+    def transform(self, data):
+        return self
+
+class MyOneHotEncoder(BaseEstimator, TransformerMixin):
+    def __init__(self, do_parse=False, delim=","):
+        self.do_parse = do_parse
+        self.delim = delim
+
+    def fit(self, x, y=None):
+        return self
+
+    def parse(self, st):
+        return st.split(self.delim)
+
+    def transform(self, data):
+        features = defaultdict(lambda: np.zeros(len(data)))
+        name = data.columns[0]
+        for i in range(len(data)):
+            value = data.iloc[i].values[0]
+            values = self.parse(value) if self.do_parse else [value]
+            for v in values:
+                features["%s=%s" % (name, v.lower())][i] += 1
+        df = pd.DataFrame(features, dtype=int, index=data.index)
+        return df
+
+class FindReplace(BaseEstimator, TransformerMixin):
+    def __init__(self, find_replace_map):
+        self.fr_map = find_replace_map
+
+    def fit(self, x, y=None):
+        return self
+
+    def transform(self, data):
+        for key, val in self.fr_map:
+            data = data.apply(lambda x: x.replace(key, val))
+        return data
+
+class Debug(BaseEstimator, TransformerMixin):
+    def fit(self, x, y=None):
+        return self
+
+    def transform(self, data):
+        print data.head()
+        return data
+        
 

@@ -2,12 +2,15 @@ from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.cross_validation import train_test_split
+from sklearn.linear_model import LassoCV
+from sklearn.feature_selection import SelectFromModel
 import pandas as pd
 
 
 text_tfidf = Pipeline([
                 ('vect', CountVectorizer()),
                 ('tfidf', TfidfTransformer()),
+                ('clv', LassoCV()),
                 ])
 
 
@@ -24,16 +27,9 @@ parameters = {
 if __name__ == "__main__":
     data = pd.read_csv('data/merged_data.csv', index_col=0)
     data = data[['prix', 'surface_m2', 'description']]
-    print len(data)
     data = data.dropna()
-    print len(data)
     y = data['prix'] / data['surface_m2']
     X = data['description']
-
-    X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.33, random_state=42)
-
-    text_tfidf.fit_transform(X_train, y_train)
-
-    import ipdb; ipdb.set_trace() # BREAKPOINT
+    text_tfidf.fit_transform(X, y)
+    print "done !"
 
