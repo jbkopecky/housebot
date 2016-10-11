@@ -2,6 +2,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from collections import defaultdict
 import pandas as pd
 import numpy as np
+from tqdm import tqdm
 
 
 class ItemSelector(BaseEstimator, TransformerMixin):
@@ -42,17 +43,12 @@ class ItemSelector(BaseEstimator, TransformerMixin):
     def transform(self, data_dict):
         return data_dict[self.key]
 
-class GoThrough(BaseEstimator, TransformerMixin):
-    def fit(self, x, y=None):
-        return self
-
-    def transform(self, data):
-        return self
 
 class MyOneHotEncoder(BaseEstimator, TransformerMixin):
     def __init__(self, do_parse=False, delim=","):
         self.do_parse = do_parse
         self.delim = delim
+        self.features = []
 
     def fit(self, x, y=None):
         return self
@@ -60,16 +56,35 @@ class MyOneHotEncoder(BaseEstimator, TransformerMixin):
     def parse(self, st):
         return st.split(self.delim)
 
+    def check_with_previously_fitted(self, feats, data_len):
+        if len(self.features) == 0:
+            self.features = feats.keys()
+        else:
+            for f in self.features:
+                if f not in feats:
+                    feats[f]
+            for f in feats.keys():
+                if f not in self.features:
+                    # This feature is unkown to the model... we drop it !
+                    del feats[f]
+        return feats
+
     def transform(self, data):
-        features = defaultdict(lambda: np.zeros(len(data)))
+        n = len(data)
+        features = defaultdict(lambda: np.zeros(n))
         name = data.columns[0]
-        for i in range(len(data)):
+
+        for i in tqdm(range(n)):
             value = data.iloc[i].values[0]
             values = self.parse(value) if self.do_parse else [value]
             for v in values:
                 features["%s=%s" % (name, v.lower())][i] += 1
+
+        features = self.check_with_previously_fitted(features, n)
+
         df = pd.DataFrame(features, dtype=int, index=data.index)
         return df
+
 
 class FindReplace(BaseEstimator, TransformerMixin):
     def __init__(self, find_replace_map):
@@ -79,16 +94,20 @@ class FindReplace(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, data):
-        for key, val in self.fr_map:
-            data = data.apply(lambda x: x.replace(key, val))
+        for col in data.columns:
+            for key, val in self.fr_map:
+                data.at[:,col] = data[col].apply(lambda x: x.replace(key, val)).values
         return data
+
 
 class Debug(BaseEstimator, TransformerMixin):
     def fit(self, x, y=None):
         return self
 
     def transform(self, data):
-        print data.head()
+        print np.shape(data)
+        # print data
+        # import ipdb; ipdb.set_trace() # BREAKPOINT
         return data
         
 
