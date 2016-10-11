@@ -51,3 +51,18 @@ In progress ...
 Here is a general view of the price distribution:
 
 ![General Scatter Plot](./plots/general_scatter.png)
+
+### Linear Model
+
+Fitted a first simple linear model with a small subset of features:
+* Area
+* number of rooms
+* Arrondissement
+* Floor Number
+* Total building floors
+
+The model is built with Sklearn Library.
+* model: `models/linear_model.py`
+
+The model errors are roughly within 25% range... Better than nothing !
+![Model Errors](./plots/linear_model_errors.png)

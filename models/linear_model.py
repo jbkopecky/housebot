@@ -27,6 +27,7 @@ def plot_results(data):
             's': 20.,
             'lw': 0.,
             }
+    titles = ["Train Set", "Test Set"]
     for i,ax in enumerate(axes):
         y_pred = data[i][0]
         y_actual = data[i][1]
@@ -36,10 +37,10 @@ def plot_results(data):
         ax.plot([0.,100000.],[0.,75000.], c='b')
         ax.set_xlabel('Predicted Price per m2')
         ax.set_ylabel('Actual Price per m2')
-        ax.set_title('Model Errors')
+        ax.set_title(titles[i])
         ax.set_ylim(0., 47000.)
         ax.set_xlim(0., 18000.)
-    plt.show()
+        ax.grid()
 
 
 fr_arrondissement = [ 
@@ -101,4 +102,6 @@ y_test_pred = pipeline.predict(X_test)
 y_train_pred = pipeline.predict(X_train)
 
 plot_results([[y_train_pred, y_train], [y_test_pred, y_test]])
+plt.savefig("./plots/linear_model_errors.png")
+plt.show()
 
