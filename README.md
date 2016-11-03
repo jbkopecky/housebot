@@ -20,11 +20,11 @@ Run scrapy from project root directory:
 $ scrapy crawl seloger
 ```
 
-Data will be stored in `data/raw_data.db` 
+Data will be stored in `data/raw_data.db`
 
 ## Settings
 
-Crawler settings are in `housebot/settings.py`. 
+Crawler settings are in `housebot/settings.py`.
 
 * `DATABASE` is the sqlite database location. Default is `'./data/raw_data.db'`
 * `TIME_SCALE` is the time before which the crawler will not update data info
@@ -65,4 +65,11 @@ The model is built with Sklearn Library.
 * model: `models/linear_model.py`
 
 The model errors are roughly within 25% range... Better than nothing !
+
 ![Model Errors](./plots/linear_model_errors.png)
+
+The blocks that appear are due to the `arrondissement` features.
+
+When we add more features into the model, the blocks tend to disappear.
+
+![Model Errors with description](./plots/linear_model_errors_with_description.png)

@@ -1,4 +1,5 @@
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.pipeline import FeatureUnion
 from collections import defaultdict
 import pandas as pd
 import numpy as np
@@ -43,6 +44,10 @@ class ItemSelector(BaseEstimator, TransformerMixin):
     def transform(self, data_dict):
         return data_dict[self.key]
 
+    def get_feature_names(self):
+        feature_names = self.key if isinstance(self.key, list) else [self.key]
+        return feature_names
+
 
 class MyOneHotEncoder(BaseEstimator, TransformerMixin):
     def __init__(self, do_parse=False, delim=","):
@@ -54,7 +59,10 @@ class MyOneHotEncoder(BaseEstimator, TransformerMixin):
         return self
 
     def parse(self, st):
-        return st.split(self.delim)
+        if pd.isnull(st):
+            return []
+        else:
+            return st.split(self.delim)
 
     def check_with_previously_fitted(self, feats, data_len):
         if len(self.features) == 0:
@@ -70,6 +78,7 @@ class MyOneHotEncoder(BaseEstimator, TransformerMixin):
         return feats
 
     def transform(self, data):
+        # TODO: split between fit / transform.
         n = len(data)
         features = defaultdict(lambda: np.zeros(n))
         name = data.columns[0]
@@ -79,11 +88,12 @@ class MyOneHotEncoder(BaseEstimator, TransformerMixin):
             values = self.parse(value) if self.do_parse else [value]
             for v in values:
                 features["%s=%s" % (name, v.lower())][i] += 1
-
         features = self.check_with_previously_fitted(features, n)
-
         df = pd.DataFrame(features, dtype=int, index=data.index)
         return df
+
+    def get_feature_names(self):
+        return self.features
 
 
 class FindReplace(BaseEstimator, TransformerMixin):
@@ -96,7 +106,9 @@ class FindReplace(BaseEstimator, TransformerMixin):
     def transform(self, data):
         for col in data.columns:
             for key, val in self.fr_map:
-                data.at[:,col] = data[col].apply(lambda x: x.replace(key, val)).values
+                data.at[:, col] = data[col].apply(
+                                                 lambda x: x.replace(key, val)
+                                                 ).values
         return data
 
 
@@ -105,9 +117,24 @@ class Debug(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, data):
-        print np.shape(data)
-        # print data
-        # import ipdb; ipdb.set_trace() # BREAKPOINT
+        import ipdb; ipdb.set_trace() # BREAKPOINT
         return data
-        
+
+
+class ReplaceNaN(BaseEstimator, TransformerMixin):
+    def __init__(self, replace_by):
+        self.replace_by = replace_by
+
+    def fit(self, x, y=None):
+        return self
+
+    def transform(self, data):
+        data.fillna(self.replace_by, inplace=True)
+        return data
+
+
+class PandasFeatureUnion(FeatureUnion):
+    def transform(self, data):
+        data = super(PandasFeatureUnion, self).transform(data)
+        import ipdb; ipdb.set_trace() # BREAKPOINT
 
