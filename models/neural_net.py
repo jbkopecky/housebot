@@ -4,17 +4,16 @@ from pipelines import FindReplace
 from pipelines import ReplaceNaN
 from utils import plot_results
 from utils import make_xy_data
-
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import Imputer
 from sklearn.cross_validation import train_test_split
 from sklearn.pipeline import FeatureUnion
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.decomposition import TruncatedSVD
-from sklearn import linear_model as lm
+from sklearn.neural_network import MLPRegressor as nnet
 import matplotlib.pyplot as plt
 
 
@@ -75,12 +74,12 @@ model = Pipeline([
          ),
         ], n_jobs=-1),
      ),
-    ('lm', lm.LassoCV(n_jobs=-1, verbose=2, max_iter=10000)),
+    ('nnet', nnet(activation='logistic', alpha='0.001', random_state=32, verbose=2)),
     ])
 
 X, y = make_xy_data('./data/merged_data.csv', ['surface_m2', 'piece'])
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=2)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=32)
 
 model.fit(X_train, y_train)
 
@@ -96,5 +95,5 @@ test_title = "Test error: ", test_error
 plot_results({train_title: [y_train_pred, y_train],
               test_title: [y_test_pred, y_test]})
 
-plt.savefig("./plots/linear_model_test.png")
+plt.savefig("./plots/neural_net.png")
 plt.show()
