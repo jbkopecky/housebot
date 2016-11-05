@@ -390,7 +390,7 @@ def mark_metro(data):
 def stats_metros(metros):
     x = []
     y = []
-    for n in sorted(metros, key=lambda b: -sum(metros[b]["prices_m2"]) / 0.1+metros[b]["number"]):
+    for n in sorted(metros.keys(), key=lambda b: -sum(metros[b]["prices_m2"]) / 0.1+metros[b]["number"]):
         num = metros[n]["number"]
         if num > 75:
             v = sum(metros[n]["prices_m2"])/num
