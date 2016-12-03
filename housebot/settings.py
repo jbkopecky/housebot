@@ -30,7 +30,7 @@ DOWNLOADER_MIDDLEWARES = {
         # 'scrapy_proxies.RandomProxy': 100,
         # 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
     # Use these Middlewares to rotate UserAgents:
-        'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware' : None,
+        'scrapy.downloadermiddleware.useragent.UserAgentMiddleware' : None,
         'housebot.comm.rotate_useragent.RotateUserAgentMiddleware' : 400
     }
 

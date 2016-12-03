@@ -135,30 +135,30 @@ class UpdateDBTags(object):
                 self.changes[(ID, tag)]['old'] = (tag_name, tag_value) 
                 self.changes[(ID, tag)]['new'] = (new_tag_name, new_tag_value)
                 if dry_run:
-                    print "-- Parse Function diff: [%s] %s:" % (ID, tag)
-                    print "     > Old: %s, %s" % (tag_name, tag_value)
-                    print "     > New: %s, %s" % (new_tag_name, new_tag_value)
+                    print( "-- Parse Function diff: [%s] %s:" % (ID, tag))
+                    print( "     > Old: %s, %s" % (tag_name, tag_value))
+                    print( "     > New: %s, %s" % (new_tag_name, new_tag_value))
 
     def apply_changes_if_not_dry(self):
         n = len(self.changes)
         if n == 0:
-            print "No changes ! DB tags are up to date !"
+            print( "No changes ! DB tags are up to date !")
         elif self.dry_run:
-            print "Did NOT Apply Changes in database: %s !" % self.db
+            print( "Did NOT Apply Changes in database: %s !" % self.db)
         else:
-            print "Applying %s Changes in database: %s..." % (n, self.db)
+            print( "Applying %s Changes in database: %s..." % (n, self.db))
             for ID, tag in self.changes:
                 new_tag_name, new_tag_value = changes[(ID, tag)]['new']
                 self.con.execute("UPDATE tags SET tag_name=?, tag_value=? WHERE ID=? AND tag=?",
                             (new_tag_name, new_tag_value, ID, tag)
                         )
-            print "... Done !"
+            print( "... Done !")
 
     def close(self):
         self.con.commit()
         self.con.close()
         print("Connexion to DB %s closed!" % self.db)
-        
+
 
 if __name__ == "__main__":
     from settings import DATABASE

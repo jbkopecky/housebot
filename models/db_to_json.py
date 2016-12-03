@@ -100,7 +100,6 @@ if __name__ == "__main__":
     data['surface_m2'] = data['surface_m2'].astype('float')
     data = data[['last_seen', 'arrondissement', 'surface_m2', 'prix_per_m2']]
     data.columns = ['date', 'z', 'x', 'y']
-    data = data[data['z']=='Paris 13eme']
-    data.to_json('../housebot_viz/data/12eme.json', orient='index')
-    # data[data['z']=='Paris 12eme'].to_csv('../housebot_viz/data/12eme.csv')
+    for arr in list(set(data['z'].values)):
+        data[data['z']==arr].to_json('../housebot_viz/data/%s.json' % str(arr).replace(" ", "_"), orient='index')
 

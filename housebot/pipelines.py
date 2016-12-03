@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unicodedata
 from scrapy import signals
-from scrapy.xlib.pydispatch import dispatcher
+from pydispatch import dispatcher
 from scrapy.exceptions import DropItem
 import sqlite3
 import os.path as path
@@ -9,9 +9,9 @@ import arrow
 import logging
 import re
 
-from settings import DATABASE
-from settings import TIME_SCALE
-from parse_tag import TagParser
+from housebot.settings import DATABASE
+from housebot.settings import TIME_SCALE
+from housebot.parse_tag import TagParser
 
 
 class Debug(object):
@@ -19,7 +19,7 @@ class Debug(object):
         pass
 
     def process_item(self, item, spider):
-        print "id: ", item['seloger_id']
+        print( "id: ", item['seloger_id'])
 
 
 class CleanText(object):
@@ -121,7 +121,7 @@ class ToSqliteDB(object):
                                 (item['ID'], timestamp, item['prix'])
                                 )
         except:
-            print 'Failed to insert item price: ' + item['ID']
+            print( 'Failed to insert item price: ' + item['ID'])
 
     def insert_item_main(self, item):
         try:
@@ -129,7 +129,7 @@ class ToSqliteDB(object):
                              (item['ID'], item['url'], item['title'], item['arrondissement'], item['agency_name'], item['agency_phone'])
                              )
         except:
-            print 'Failed to insert item main: ' + item['ID']
+            print( 'Failed to insert item main: ' + item['ID'])
 
     def insert_item_single_tag(self, item_id, tag, tag_name, tag_value):
         try:
@@ -137,7 +137,7 @@ class ToSqliteDB(object):
                              (item_id, tag, tag_name, tag_value)
                              )
         except:
-            print 'Failed to insert item tag: ' + item_id + ": " + tag
+            print( 'Failed to insert item tag: ' + item_id + ": " + tag)
 
     def insert_item_tag_list(self, item):
         tags = item['property_list']
@@ -152,7 +152,7 @@ class ToSqliteDB(object):
                              (item['ID'], item['full_description'])
                              )
         except:
-            print 'Failed to insert item tag: ' + item_id + ": " + tag
+            print( 'Failed to insert item tag: ' + item_id + ": " + tag)
 
     def initialize(self):
         if path.exists(self.filename):
